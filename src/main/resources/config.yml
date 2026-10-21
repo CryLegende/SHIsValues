@@ -1,0 +1,71 @@
+# Configuration pour SHIsValues
+
+gui:
+  title: "&8&lMenu &8| Valeurs (%page%/%max_pages%)"
+  rows: 6 # Nombre de rangées
+
+  # Slots spécifiques pour les items de valeur.
+  # La taille de cette liste détermine le nombre d'items de valeur par page.
+  # Si cette liste est vide, les items de valeur rempliront les slots disponibles
+  # non occupés par les items définis dans 'gui.items'.
+  value_item_slots: [
+    11,12,13,14,15,
+    20,21,22,23,24,
+    29,30,31,32,33
+    # Ajoutez autant de slots que vous voulez par page pour les items de valeur
+  ]
+
+  # Définition des items statiques (fillers, boutons, décorations)
+  # Chaque clé est un identifiant unique pour l'item.
+  # Ces items sont placés sur TOUTES les pages.
+  items:
+    previous_button:
+      enabled: true
+      material: "ARROW"
+      name: "&c⤾ Page précédente &7(Clic)"
+      lore: []
+      slots: [48] # Peut être une liste, mais pour un bouton, c'est souvent un seul slot
+      action: "PREVIOUS_PAGE" # Action spéciale pour ce bouton
+    next_button:
+      enabled: true
+      material: "ARROW"
+      name: "&a⤿ Page suivante &7(Clic)"
+      lore: []
+      slots: [50]
+      action: "NEXT_PAGE" # Action spéciale
+    top_border:
+      enabled: true
+      material: "BLACK_STAINED_GLASS_PANE"
+      name: " " # Nom vide pour un filler
+      lore: []
+      slots: [0,1,2,3,4,5,6,7,8,38,39,40,41,42,45,46,47,49,51,52,53] # Remplir toute la première ligne
+    side_borders:
+      enabled: true
+      material: "GRAY_STAINED_GLASS_PANE"
+      name: " "
+      lore: []
+      slots: [9,10,16,17,18,19,25,26,27,28,34,35,36,37,43,44] # Slots pour les bordures latérales
+
+
+  # Configuration pour les items représentant les valeurs des blocs
+  block_value_item:
+    amount: "%superior_island_count_{material_id}%"
+    lore:
+      - "&fCe bloc vaut &e%value% &fniveaux d'île"
+      - ""
+      - "&f• &7Quantité: &f%superior_island_count_{material_id}%x"
+      - ""
+
+messages:
+  no_permission: "&7&l« &c&lSH &8&l» &7Vous n'avez pas la permission d'utiliser cette commande."
+  player_only: "&7&l« &c&lSH &8&l» &7Cette commande ne peut être exécutée que par un joueur."
+  gui_opened: "&7&l« &a&lSH &8&l» &7Ouverture du menu des &avaleurs&7..."
+  item_not_found_in_values: "&7&l« &c&lSH &8&l» &7L'item que vous tenez n'a pas de valeur définie ou n'a pas pu être trouvé."
+  ssb2_values_not_found: "&7&l« &c&lSH &8&l» &7Impossible de charger les valeurs des blocs depuis &cSuperiorSkyblock2&7. Le fichier est-il présent ?"
+  ssb2_values_error: "&7&l« &c&lSH &8&l» &7Une erreur est survenue lors de la lecture des valeurs de &cSuperiorSkyblock2&7."
+  config_reloaded: "&7&l« &a&lSH &8&l» &7Configuration de SHIsValues rechargée &aavec succès&7."
+  no_value_slots_configured: "&7&l« &c&lSH &8&l» &7Aucun slot n'est configuré pour les items de valeur et le remplissage automatique n'a trouvé aucun slot. &cVérifiez la configuration du GUI&7."
+  no_values_to_display: "&7&l« &e&lSH &8&l» &7Il n'y a aucune valeur de bloc à afficher pour le moment."
+
+
+superior_skyblock_values_path: "plugins/SuperiorSkyblock2/block-values/levels.yml"
