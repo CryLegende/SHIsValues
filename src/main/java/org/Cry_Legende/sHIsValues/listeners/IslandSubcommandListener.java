@@ -30,8 +30,14 @@ public class IslandSubcommandListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     // Priorité haute pour intercepter avant les autres
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
+        // Sortie rapide : cet événement passe pour chaque commande de chaque joueur
+        String rawMessage = event.getMessage();
+        if (!rawMessage.regionMatches(true, 0, "/is ", 0, 4)) {
+            return;
+        }
+
         Player player = event.getPlayer();
-        String commandMessage = event.getMessage().toLowerCase(); // "/is values" ou "/is value"
+        String commandMessage = rawMessage.toLowerCase(); // "/is values" ou "/is value"
 
         String[] parts = commandMessage.split(" ");
         if (parts.length < 1) return;

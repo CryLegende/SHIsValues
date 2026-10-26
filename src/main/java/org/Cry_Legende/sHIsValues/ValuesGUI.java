@@ -11,8 +11,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag; // Importation nécessaire
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,20 +21,32 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class ValuesGUI implements Listener {
 
     private final SHIsValues plugin;
     private final ConfigManager configManager;
     private final ValuesManager valuesManager;
-    private final Map<UUID, Integer> playerPages = new HashMap<>();
-    private final Map<UUID, String> openInventories = new HashMap<>();
+
+    /**
+     * Identifie le menu (et sa page) sans dépendre du titre : rien à nettoyer à la fermeture.
+     */
+    private static final class ValuesHolder implements InventoryHolder {
+        private final int page;
+        private Inventory inventory;
+
+        private ValuesHolder(int page) {
+            this.page = page;
+        }
+
+        @Override
+        public Inventory getInventory() {
+            return inventory;
+        }
+    }
 
     private final DecimalFormat valueFormatter;
 
@@ -157,21 +170,23 @@ public class ValuesGUI implements Listener {
             player.sendMessage(configManager.noValuesToDisplayMsg);
         }
 
-        Inventory gui = Bukkit.createInventory(null, configManager.guiRows * 9, "TempTitle");
+        // Contenu préparé dans un tableau : le titre (et donc l'inventaire) dépend du nombre de pages calculé plus bas
+        final int guiSize = configManager.guiRows * 9;
+        ItemStack[] gui = new ItemStack[guiSize];
         Set<Integer> occupiedSlots = new HashSet<>();
 
         for (GuiItemConfig staticItemConf : configManager.staticGuiItems.values()) {
             if (!staticItemConf.isEnabled()) continue;
             ItemStack itemStack = createConfiguredItemStack(player, staticItemConf);
             for (int slot : staticItemConf.getSlots()) {
-                if (slot >= 0 && slot < gui.getSize()) {
-                    if (gui.getItem(slot) != null) {
-                        plugin.getLogger().warning("Conflit de slot pour item statique! Slot " + slot + " (pour " + staticItemConf.getId() + ") est déjà occupé par '" + gui.getItem(slot).getType() + "'. L'item '" + itemStack.getType() + "' va l'écraser.");
+                if (slot >= 0 && slot < guiSize) {
+                    if (gui[slot] != null) {
+                        plugin.getLogger().warning("Conflit de slot pour item statique! Slot " + slot + " (pour " + staticItemConf.getId() + ") est déjà occupé par '" + gui[slot].getType() + "'. L'item '" + itemStack.getType() + "' va l'écraser.");
                     }
-                    gui.setItem(slot, itemStack);
+                    gui[slot] = itemStack;
                     occupiedSlots.add(slot);
                 } else {
-                    plugin.getLogger().warning("Slot " + slot + " pour item statique '" + staticItemConf.getId() + "' est hors limites (0-" + (gui.getSize() - 1) + ").");
+                    plugin.getLogger().warning("Slot " + slot + " pour item statique '" + staticItemConf.getId() + "' est hors limites (0-" + (guiSize - 1) + ").");
                 }
             }
         }
@@ -182,18 +197,18 @@ public class ValuesGUI implements Listener {
         if (!configManager.valueItemSlots.isEmpty()) {
             availableValueSlots = new ArrayList<>();
             for (int configuredSlot : configManager.valueItemSlots) {
-                if (configuredSlot >= 0 && configuredSlot < gui.getSize() && !occupiedSlots.contains(configuredSlot)) {
+                if (configuredSlot >= 0 && configuredSlot < guiSize && !occupiedSlots.contains(configuredSlot)) {
                     availableValueSlots.add(configuredSlot);
                 } else if (occupiedSlots.contains(configuredSlot)) {
                     plugin.getLogger().info("Slot configuré " + configuredSlot + " dans 'value_item_slots' est déjà occupé par un item statique. Il sera ignoré pour les items de valeur.");
                 } else {
-                    plugin.getLogger().warning("Slot configuré " + configuredSlot + " dans 'value_item_slots' est hors limites (0-" + (gui.getSize() - 1) + "). Il sera ignoré.");
+                    plugin.getLogger().warning("Slot configuré " + configuredSlot + " dans 'value_item_slots' est hors limites (0-" + (guiSize - 1) + "). Il sera ignoré.");
                 }
             }
             effectiveItemsPerPage = availableValueSlots.size();
         } else {
             availableValueSlots = new ArrayList<>();
-            for (int i = 0; i < gui.getSize(); i++) {
+            for (int i = 0; i < guiSize; i++) {
                 if (!occupiedSlots.contains(i)) {
                     availableValueSlots.add(i);
                 }
@@ -223,7 +238,7 @@ public class ValuesGUI implements Listener {
                 }
                 BlockValue blockValue = allBlockValues.get(startIndex + i);
                 int targetSlot = availableValueSlots.get(i);
-                gui.setItem(targetSlot, createBlockValueItemStack(player, blockValue));
+                gui[targetSlot] = createBlockValueItemStack(player, blockValue);
             }
         }
 
@@ -233,22 +248,20 @@ public class ValuesGUI implements Listener {
         if (plugin.isPlaceholderApiHooked()) {
             title = PlaceholderAPI.setPlaceholders(player, title);
         }
-        Inventory finalGui = Bukkit.createInventory(null, gui.getSize(), title);
-        finalGui.setContents(gui.getContents());
+        ValuesHolder holder = new ValuesHolder(page);
+        Inventory finalGui = Bukkit.createInventory(holder, guiSize, title);
+        holder.inventory = finalGui;
+        finalGui.setContents(gui);
 
-        playerPages.put(player.getUniqueId(), page);
-        openInventories.put(player.getUniqueId(), title);
         player.openInventory(finalGui);
     }
 
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        Player player = (Player) event.getWhoClicked();
-        String currentViewTitle = event.getView().getTitle();
-
-        if (!openInventories.containsKey(player.getUniqueId()) ||
-            !currentViewTitle.equals(openInventories.get(player.getUniqueId()))) {
+        // getHolder(false) : pas d'instantané du bloc pour les coffres, cet événement passe pour tous les clics du serveur
+        if (!(event.getView().getTopInventory().getHolder(false) instanceof ValuesHolder holder)
+            || !(event.getWhoClicked() instanceof Player player)) {
             return;
         }
 
@@ -259,7 +272,7 @@ public class ValuesGUI implements Listener {
         int clickedSlot = event.getRawSlot();
         if (clickedSlot >= event.getInventory().getSize()) return;
 
-        int currentPage = playerPages.getOrDefault(player.getUniqueId(), 1);
+        int currentPage = holder.page;
 
         for (GuiItemConfig staticItemConf : configManager.staticGuiItems.values()) {
             if (!staticItemConf.isEnabled() || staticItemConf.getAction() == null) continue;
@@ -330,12 +343,10 @@ public class ValuesGUI implements Listener {
 
 
     @EventHandler
-    public void onInventoryClose(InventoryCloseEvent event) {
-        Player player = (Player) event.getPlayer();
-        if (openInventories.containsKey(player.getUniqueId()) &&
-            event.getView().getTitle().equals(openInventories.get(player.getUniqueId()))) {
-            playerPages.remove(player.getUniqueId());
-            openInventories.remove(player.getUniqueId());
+    public void onInventoryDrag(InventoryDragEvent event) {
+        // Aucun dépôt d'item dans le menu, quelle que soit la façon de glisser
+        if (event.getView().getTopInventory().getHolder(false) instanceof ValuesHolder) {
+            event.setCancelled(true);
         }
     }
 
