@@ -62,6 +62,14 @@ public class IslandSubcommandListener implements Listener {
                 player.sendMessage(configManager.guiOpenedMsg);
                 return; // Ta commande a été gérée
 
+            } else if (subCommand.equals("acces") || subCommand.equals("accès")) {
+                if (!player.hasPermission("shisvalues.command.is.acces")) {
+                    return;
+                }
+                event.setCancelled(true);
+                plugin.getAccessList().show(player);
+                return;
+
             } else if (subCommand.equals("value")) {
                 if (!player.hasPermission("shisvalues.command.is.value")) { // Permission spécifique
                     return;

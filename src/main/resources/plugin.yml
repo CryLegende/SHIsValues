@@ -12,3 +12,8 @@ commands:
     description: Commandes relatives aux valeurs d'île.
     usage: /<command> values | /<command> value
     # Les sous-commandes seront gérées dans le code
+
+permissions:
+  shisvalues.command.is.acces:
+    description: /is acces, joueurs ayant des permissions particulières sur son île.
+    default: true

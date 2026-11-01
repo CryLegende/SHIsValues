@@ -15,6 +15,11 @@ public class SHIsValues extends JavaPlugin {
     private ConfigManager configManager;
     private ValuesManager valuesManager;
     private ValuesGUI valuesGUI; // Doit être initialisé
+    private org.Cry_Legende.sHIsValues.access.AccessList accessList;
+
+    public org.Cry_Legende.sHIsValues.access.AccessList getAccessList() {
+        return accessList;
+    }
     private boolean placeholderApiHooked = false;
 
     @Override
@@ -46,6 +51,8 @@ public class SHIsValues extends JavaPlugin {
 
         // Initialisation du gestionnaire de GUI
         valuesGUI = new ValuesGUI(this); // Important: initialiser avant de l'utiliser ou de le passer
+        // /is acces : joueurs ayant des permissions particulières sur l'île
+        accessList = new org.Cry_Legende.sHIsValues.access.AccessList(this);
 
         // Enregistrement de la commande principale /shiv
         ValuesCommand shivExecutor = new ValuesCommand(this); // L'exécuteur pour /shiv

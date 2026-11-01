@@ -69,3 +69,14 @@ messages:
 
 
 superior_skyblock_values_path: "plugins/SuperiorSkyblock2/block-values/levels.yml"
+# /is acces : joueurs ayant des permissions particulières sur l'île (réglées avec /is permissions <joueur>).
+# Clic sur une ligne = menu de permissions du joueur. Noms des permissions : menus/permissions.yml de SuperiorSkyblock2.
+# Placeholders : %count% (header), %player% (line, hover), %permissions% (line), %list% (allowed, denied).
+access-messages:
+  no-island: "&7&l« &c&lSH &8&l» &7Vous n'avez pas d'île (&c/is&7)."
+  empty: "&7&l« &e&lSH &8&l» &7Aucun joueur n'a de permission particulière sur votre île."
+  header: "&7&l« &e&lSH &8&l» &7Permissions particulières sur votre île (&e%count% joueur(s)&7) :"
+  line: "&8• &e%player% &8» %permissions%"
+  allowed: "&a✔ %list%"
+  denied: "&c✘ %list%"
+  hover: "&7Cliquez pour modifier les permissions de &e%player%"
