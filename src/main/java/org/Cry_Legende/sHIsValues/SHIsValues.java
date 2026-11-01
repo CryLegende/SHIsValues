@@ -53,6 +53,10 @@ public class SHIsValues extends JavaPlugin {
         valuesGUI = new ValuesGUI(this); // Important: initialiser avant de l'utiliser ou de le passer
         // /is acces : joueurs ayant des permissions particulières sur l'île
         accessList = new org.Cry_Legende.sHIsValues.access.AccessList(this);
+        if (placeholderApiHooked) {
+            // %shisvalues_acces_<status|allowed|denied>_<chef>% (utilisé par /infos <joueur>)
+            new org.Cry_Legende.sHIsValues.access.AccessExpansion(this, accessList).register();
+        }
 
         // Enregistrement de la commande principale /shiv
         ValuesCommand shivExecutor = new ValuesCommand(this); // L'exécuteur pour /shiv

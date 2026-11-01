@@ -80,3 +80,14 @@ access-messages:
   allowed: "&a✔ %list%"
   denied: "&c✘ %list%"
   hover: "&7Cliquez pour modifier les permissions de &e%player%"
+
+# Placeholders %shisvalues_acces_<status|allowed|denied>_<chef>% : accès du joueur du contexte à l'île de <chef>
+# (utilisés par /infos <joueur> avec %viewer%). %role% = rôle du membre.
+access-placeholders:
+  no-island: "&7Aucune île"
+  owner: "&6Chef de l'île"
+  member: "&aMembre &7(%role%&7)"
+  coop: "&bCoopérateur"
+  banned: "&cBanni"
+  visitor: "&7Visiteur"
+  none: "&8aucune"

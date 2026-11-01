@@ -69,7 +69,8 @@ public final class AccessList {
         return config.getString("access-messages." + key, def);
     }
 
-    private String privilegeName(IslandPrivilege privilege) {
+    /** Nom affiché d'une permission (menu de permissions de SSB2, sinon son identifiant). */
+    public String privilegeName(IslandPrivilege privilege) {
         String id = privilege.getName().toLowerCase(Locale.ROOT);
         return privilegeNames.getOrDefault(id, id.replace('_', ' '));
     }
