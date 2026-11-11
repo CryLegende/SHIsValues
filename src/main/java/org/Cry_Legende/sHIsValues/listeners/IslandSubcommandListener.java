@@ -52,7 +52,7 @@ public class IslandSubcommandListener implements Listener {
             String subCommand = parts[1];
 
             if (subCommand.equals("values")) {
-                if (!player.hasPermission("shisvalues.command.is.values")) { // Permission spécifique
+                if (!player.hasPermission("shisvalues.is.values")) { // Permission spécifique
                     // Optionnel: envoyer un message d'erreur si tu veux indiquer que la sous-commande existe mais qu'il manque la perm
                     // player.sendMessage(configManager.noPermissionMsg);
                     return; // Laisse SSB2 ou un autre plugin gérer si le joueur n'a pas la perm pour ta sous-commande
@@ -63,7 +63,7 @@ public class IslandSubcommandListener implements Listener {
                 return; // Ta commande a été gérée
 
             } else if (subCommand.equals("acces") || subCommand.equals("accès")) {
-                if (!player.hasPermission("shisvalues.command.is.acces")) {
+                if (!player.hasPermission("shisvalues.is.acces")) {
                     return;
                 }
                 event.setCancelled(true);
@@ -71,7 +71,7 @@ public class IslandSubcommandListener implements Listener {
                 return;
 
             } else if (subCommand.equals("value")) {
-                if (!player.hasPermission("shisvalues.command.is.value")) { // Permission spécifique
+                if (!player.hasPermission("shisvalues.is.value")) { // Permission spécifique
                     return;
                 }
                 event.setCancelled(true); // Annule l'événement

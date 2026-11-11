@@ -1,0 +1,41 @@
+# Messages de SHIsValues. Codes couleur & acceptés.
+# Placeholders : %subcommands% (sous-commandes permises), %file% et %error% (fichier illisible au rechargement).
+
+# /shisvalues et /is values, /is value
+no_permission: "&7&l« &c&lSH &8&l» &7Vous n'avez pas la permission d'utiliser cette commande."
+player_only: "&7&l« &c&lSH &8&l» &7Cette commande ne peut être exécutée que par un joueur."
+usage: "&7&l« &e&lSH &8&l» &7Utilisation : &e/shisvalues &7<&e%subcommands%&7>"
+gui_opened: "&7&l« &a&lSH &8&l» &7Ouverture du menu des &avaleurs&7..."
+item_not_found_in_values: "&7&l« &c&lSH &8&l» &7L'item que vous tenez n'a pas de valeur définie ou n'a pas pu être trouvé."
+ssb2_values_not_found: "&7&l« &c&lSH &8&l» &7Impossible de charger les valeurs des blocs depuis &cSuperiorSkyblock2&7. Le fichier est-il présent ?"
+ssb2_values_error: "&7&l« &c&lSH &8&l» &7Une erreur est survenue lors de la lecture des valeurs de &cSuperiorSkyblock2&7."
+no_value_slots_configured: "&7&l« &c&lSH &8&l» &7Aucun slot n'est configuré pour les items de valeur et le remplissage automatique n'a trouvé aucun slot. &cVérifiez la configuration du GUI&7."
+no_values_to_display: "&7&l« &e&lSH &8&l» &7Il n'y a aucune valeur de bloc à afficher pour le moment."
+
+# /shisvalues reload
+config_reloaded: "&7&l« &a&lSH &8&l» &7Configuration de SHIsValues rechargée &aavec succès&7."
+reload_failed: "&7&l« &c&lSH &8&l» &7Rechargement annulé : &c%file% &7est illisible (&c%error%&7). L'ancienne configuration est gardée."
+reload_values_error: "&7&l« &c&lSH &8&l» &7Les valeurs de blocs n'ont pas pu être relues (voir la console) : les &cvaleurs précédentes &7sont conservées."
+
+# /is acces : joueurs ayant des permissions particulières sur l'île (réglées avec /is permissions <joueur>).
+# Clic sur une ligne = menu de permissions du joueur. Noms des permissions : menus/permissions.yml de SuperiorSkyblock2.
+# Placeholders : %count% (header), %player% (line, hover), %permissions% (line), %list% (allowed, denied).
+access-messages:
+  no-island: "&7&l« &c&lSH &8&l» &7Vous n'avez pas d'île (&c/is&7)."
+  empty: "&7&l« &e&lSH &8&l» &7Aucun joueur n'a de permission particulière sur votre île."
+  header: "&7&l« &e&lSH &8&l» &7Permissions particulières sur votre île (&e%count% joueur(s)&7) :"
+  line: "&8• &e%player% &8» %permissions%"
+  allowed: "&a✔ %list%"
+  denied: "&c✘ %list%"
+  hover: "&7Cliquez pour modifier les permissions de &e%player%"
+
+# Placeholders %shisvalues_acces_<status|allowed|denied>_<chef>% : accès du joueur du contexte à l'île de <chef>
+# (utilisés par /infos <joueur> avec %viewer%). %role% = rôle du membre.
+access-placeholders:
+  no-island: "&7Aucune île"
+  owner: "&6Chef de l'île"
+  member: "&aMembre &7(%role%&7)"
+  coop: "&bCoopérateur"
+  banned: "&cBanni"
+  visitor: "&7Visiteur"
+  none: "&8aucune"

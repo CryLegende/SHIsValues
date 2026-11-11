@@ -55,7 +55,7 @@ public final class AccessExpansion extends PlaceholderExpansion {
     }
 
     private String text(String key, String def) {
-        return plugin.getConfig().getString("access-placeholders." + key, def);
+        return plugin.getMessages().getString("access-placeholders." + key, def);
     }
 
     @Override

@@ -14,11 +14,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
+/**
+ * /shisvalues (alias /shiv) : values, value (menu des valeurs de blocs) et reload.
+ */
 public class ValuesCommand implements CommandExecutor, TabCompleter {
+
+    private static final String VALUES = "shisvalues.values";
+    private static final String VALUE = "shisvalues.value";
+    private static final String RELOAD = "shisvalues.admin.reload";
 
     private final SHIsValues plugin;
     private final ConfigManager configManager;
@@ -32,102 +39,87 @@ public class ValuesCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            sendHelp(sender, label);
+        List<String> allowed = allowed(sender);
+        if (allowed.isEmpty()) {
+            sender.sendMessage(configManager.noPermissionMsg);
+            return true;
+        }
+        String subCommand = args.length == 0 ? "" : args[0].toLowerCase(Locale.ROOT);
+        if (!allowed.contains(subCommand)) {
+            sender.sendMessage(configManager.message("usage", "%subcommands%", String.join("|", allowed)));
             return true;
         }
 
-        String subCommand = args[0].toLowerCase();
-
         switch (subCommand) {
-            case "values":
-                if (!sender.hasPermission("shisvalues.command.values")) { // ou shisvalues.shiv.values
-                    sender.sendMessage(configManager.noPermissionMsg);
-                    return true;
-                }
-                if (!(sender instanceof Player)) {
+            case "values" -> {
+                if (!(sender instanceof Player player)) {
                     sender.sendMessage(configManager.playerOnlyMsg);
                     return true;
                 }
-                Player player = (Player) sender;
                 valuesGUI.openValuesInventory(player, 1);
-                // Le message d'ouverture peut être géré dans openValuesInventory ou ici.
-                // Si openValuesInventory ne l'envoie pas, décommentez :
-                // player.sendMessage(configManager.guiOpenedMsg);
-                return true;
-
-            case "value":
-                if (!sender.hasPermission("shisvalues.command.value")) { // ou shisvalues.shiv.value
-                    sender.sendMessage(configManager.noPermissionMsg);
-                    return true;
-                }
-                if (!(sender instanceof Player)) {
+            }
+            case "value" -> {
+                if (!(sender instanceof Player player)) {
                     sender.sendMessage(configManager.playerOnlyMsg);
                     return true;
                 }
-                Player targetPlayer = (Player) sender;
-                ItemStack itemInHand = targetPlayer.getInventory().getItemInMainHand();
-
+                ItemStack itemInHand = player.getInventory().getItemInMainHand();
                 if (itemInHand.getType() == Material.AIR) {
-                    targetPlayer.sendMessage(configManager.itemNotFoundMsg); // Ou "Tenez un item pour voir sa valeur."
+                    player.sendMessage(configManager.itemNotFoundMsg);
                     return true;
                 }
-
-                Material materialInHand = itemInHand.getType();
-                int page = valuesGUI.getPageForItem(materialInHand, targetPlayer);
-
+                int page = valuesGUI.getPageForItem(itemInHand.getType(), player);
                 if (page != -1) {
-                    valuesGUI.openValuesInventory(targetPlayer, page);
-                    // targetPlayer.sendMessage(configManager.guiOpenedMsg);
+                    valuesGUI.openValuesInventory(player, page);
                 } else {
-                    targetPlayer.sendMessage(configManager.itemNotFoundMsg);
+                    player.sendMessage(configManager.itemNotFoundMsg);
                 }
-                return true;
+            }
+            default -> reload(sender);
+        }
+        return true;
+    }
 
-            case "reload":
-                if (!sender.hasPermission("shisvalues.command.reload")) { // ou shisvalues.shiv.reload
-                    sender.sendMessage(configManager.noPermissionMsg);
-                    return true;
-                }
-                plugin.getConfigManager().reloadConfig(); // Utiliser le getter pour ConfigManager
-                if (!plugin.getValuesManager().loadBlockValues()) { // Utiliser le getter pour ValuesManager
-                    sender.sendMessage(plugin.color("&cErreur lors du rechargement des valeurs de blocs. Vérifiez la console."));
-                } else {
-                    sender.sendMessage(configManager.configReloadedMsg);
-                }
-                return true;
-
-            default:
-                sendHelp(sender, label);
-                return true;
+    private void reload(CommandSender sender) {
+        try {
+            configManager.reloadConfig();
+        } catch (SHIsValues.ConfigException e) {
+            plugin.getLogger().severe("Rechargement annulé, " + e.getFile() + " illisible : " + e.getMessage());
+            sender.sendMessage(configManager.message("reload_failed", "%file%", e.getFile(), "%error%", String.valueOf(e.getMessage())));
+            return;
+        }
+        plugin.getAccessList().loadPrivilegeNames();
+        if (!plugin.getValuesManager().loadBlockValues()) {
+            sender.sendMessage(configManager.message("reload_values_error"));
+        } else {
+            sender.sendMessage(configManager.configReloadedMsg);
         }
     }
 
-    private void sendHelp(CommandSender sender, String label) {
-        sender.sendMessage(plugin.color("&6--- SHIsValues Aide (" + label + ") ---"));
-        sender.sendMessage(plugin.color("&e/" + label + " values &7- Ouvre le menu des valeurs."));
-        sender.sendMessage(plugin.color("&e/" + label + " value &7- Ouvre le menu à la page de l'item en main."));
-        if (sender.hasPermission("shisvalues.command.reload")) { // ou shisvalues.shiv.reload
-            sender.sendMessage(plugin.color("&e/" + label + " reload &7- Recharge la configuration."));
+    /** Sous-commandes que l'expéditeur a le droit d'utiliser. */
+    private static List<String> allowed(CommandSender sender) {
+        List<String> names = new ArrayList<>();
+        if (sender.hasPermission(VALUES)) {
+            names.add("values");
         }
+        if (sender.hasPermission(VALUE)) {
+            names.add("value");
+        }
+        if (sender.hasPermission(RELOAD)) {
+            names.add("reload");
+        }
+        return names;
     }
 
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("shiv")) { // Assurez-vous que la commande principale est "shiv" dans plugin.yml
-            if (args.length == 1) {
-                List<String> completions = new ArrayList<>(Arrays.asList("values", "value"));
-                if (sender.hasPermission("shisvalues.command.reload")) { // ou shisvalues.shiv.reload
-                    completions.add("reload");
-                }
-                // Filtrage pour l'auto-complétion
-                String currentArg = args[0].toLowerCase();
-                return completions.stream()
-                    .filter(s -> s.toLowerCase().startsWith(currentArg))
-                    .collect(Collectors.toList());
-            }
+        if (args.length == 1) {
+            String currentArg = args[0].toLowerCase(Locale.ROOT);
+            return allowed(sender).stream()
+                .filter(s -> s.startsWith(currentArg))
+                .collect(Collectors.toList());
         }
-        return null; // Ou Collections.emptyList();
+        return List.of();
     }
 }

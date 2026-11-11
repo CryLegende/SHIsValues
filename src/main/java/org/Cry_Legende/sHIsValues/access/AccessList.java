@@ -12,7 +12,6 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.Cry_Legende.sHIsValues.SHIsValues;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -65,8 +64,7 @@ public final class AccessList {
     }
 
     private String message(String key, String def) {
-        FileConfiguration config = plugin.getConfig();
-        return config.getString("access-messages." + key, def);
+        return plugin.getMessages().getString("access-messages." + key, def);
     }
 
     /** Nom affiché d'une permission (menu de permissions de SSB2, sinon son identifiant). */

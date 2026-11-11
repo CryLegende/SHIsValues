@@ -39,9 +39,19 @@ public class ConfigManager {
         this.staticGuiItems = new HashMap<>();
     }
 
-    public void loadConfig() {
-        plugin.reloadConfig(); // S'assure que la dernière version est chargée depuis le disque
+    /**
+     * Relit config.yml et messages.yml. Rien n'est remplacé tant que les deux fichiers ne sont pas lus sans erreur :
+     * sinon l'exception porte le fichier en cause et l'ancienne configuration reste en place.
+     */
+    public void loadConfig() throws SHIsValues.ConfigException {
+        plugin.applyFiles(plugin.readFiles());
+        parse();
+    }
+
+    /** Lit les réglages dans les fichiers déjà chargés par le plugin. */
+    public void parse() {
         config = plugin.getConfig();
+        FileConfiguration messages = plugin.getMessages();
         staticGuiItems.clear(); // Nettoyer avant de recharger
 
         guiTitle = plugin.color(config.getString("gui.title", "&2Valeurs des Blocs (Page %page%/%max_pages%)"));
@@ -84,26 +94,37 @@ public class ConfigManager {
         blockValueItemAmount = config.getString("gui.block_value_item.amount", "1");
 
         // Messages
-        noPermissionMsg = plugin.color(config.getString("messages.no_permission", "&cNo permission."));
-        playerOnlyMsg = plugin.color(config.getString("messages.player_only", "&cPlayer only."));
-        guiOpenedMsg = plugin.color(config.getString("messages.gui_opened", "&aGUI opened."));
-        itemNotFoundMsg = plugin.color(config.getString("messages.item_not_found_in_values", "&cItem not found in values."));
-        ssb2ValuesNotFoundMsg = plugin.color(config.getString("messages.ssb2_values_not_found", "&cSSB2 values not found."));
-        ssb2ValuesErrorMsg = plugin.color(config.getString("messages.ssb2_values_error", "&cError reading SSB2 values."));
-        configReloadedMsg = plugin.color(config.getString("messages.config_reloaded", "&aConfig reloaded."));
-        noValueSlotsConfiguredMsg = plugin.color(config.getString("messages.no_value_slots_configured", "&cNo slots for value items."));
-        noValuesToDisplayMsg = plugin.color(config.getString("messages.no_values_to_display", "&cNo values to display."));
+        noPermissionMsg = plugin.color(messages.getString("no_permission", "&cNo permission."));
+        playerOnlyMsg = plugin.color(messages.getString("player_only", "&cPlayer only."));
+        guiOpenedMsg = plugin.color(messages.getString("gui_opened", "&aGUI opened."));
+        itemNotFoundMsg = plugin.color(messages.getString("item_not_found_in_values", "&cItem not found in values."));
+        ssb2ValuesNotFoundMsg = plugin.color(messages.getString("ssb2_values_not_found", "&cSSB2 values not found."));
+        ssb2ValuesErrorMsg = plugin.color(messages.getString("ssb2_values_error", "&cError reading SSB2 values."));
+        configReloadedMsg = plugin.color(messages.getString("config_reloaded", "&aConfig reloaded."));
+        noValueSlotsConfiguredMsg = plugin.color(messages.getString("no_value_slots_configured", "&cNo slots for value items."));
+        noValuesToDisplayMsg = plugin.color(messages.getString("no_values_to_display", "&cNo values to display."));
 
         ssb2ValuesPath = config.getString("superior_skyblock_values_path", "plugins/SuperiorSkyblock2/block-values/levels.yml");
+    }
+
+    /** Texte de messages.yml, couleurs appliquées ; les paires de remplacements sont (placeholder, valeur). */
+    public String message(String key, String... replacements) {
+        String text = plugin.getMessages().getString(key);
+        if (text == null) {
+            return plugin.color("&cMessage manquant : " + key);
+        }
+        for (int i = 0; i + 1 < replacements.length; i += 2) {
+            text = text.replace(replacements[i], replacements[i + 1]);
+        }
+        return plugin.color(text);
     }
 
     public GuiItemConfig getStaticItemConfig(String id) {
         return staticGuiItems.get(id);
     }
 
-    public void reloadConfig() {
-        plugin.saveDefaultConfig(); // S'assure que le fichier par défaut existe s'il a été supprimé
-        plugin.reloadConfig();
-        loadConfig(); // Re-parse les valeurs
+    /** Rechargement complet (commande reload) : config.yml et messages.yml, sans rien appliquer en cas d'erreur. */
+    public void reloadConfig() throws SHIsValues.ConfigException {
+        loadConfig();
     }
 }

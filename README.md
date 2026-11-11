@@ -27,7 +27,29 @@ Utilisé sur : **Opale**.
 
 | Commande | Alias | Description | Permission |
 |---|---|---|---|
-| `/shiv` | — | Commandes relatives aux valeurs d'île. | — |
+| `/shisvalues values` | `/shiv` | Ouvre le menu des valeurs de blocs (joueurs seulement). | `shisvalues.values` |
+| `/shisvalues value` | `/shiv` | Ouvre le menu à la page de l'objet tenu en main (joueurs seulement). | `shisvalues.value` |
+| `/shisvalues reload` | `/shiv` | Recharge `config.yml`, `messages.yml`, les valeurs de SuperiorSkyblock2 et les noms des permissions d'île ; un fichier invalide annule le rechargement. Marche aussi depuis la console. | `shisvalues.admin.reload` |
+
+Le plugin prend aussi en charge trois sous-commandes de `/is` (SuperiorSkyblock2 traite `/is` normalement pour qui n'a pas le droit) :
+
+| Commande | Description | Permission |
+|---|---|---|
+| `/is values` | Même menu que `/shisvalues values` | `shisvalues.is.values` |
+| `/is value` | Même menu que `/shisvalues value` | `shisvalues.is.value` |
+| `/is acces` | Joueurs ayant des permissions particulières sur votre île | `shisvalues.is.acces` |
+
+## Permissions
+
+| Permission | Description | Par défaut |
+|---|---|---|
+| `shisvalues.values` | `/shisvalues values` | `op` |
+| `shisvalues.value` | `/shisvalues value` | `op` |
+| `shisvalues.is.values` | `/is values` gérée par le plugin | `op` |
+| `shisvalues.is.value` | `/is value` gérée par le plugin | `op` |
+| `shisvalues.is.acces` | `/is acces` | `true` |
+| `shisvalues.admin` | Toutes les commandes d'administration (parent de la suivante) | `op` |
+| `shisvalues.admin.reload` | `/shisvalues reload` | `false` |
 
 ## Configuration
 
@@ -35,8 +57,11 @@ Fichiers par défaut repris du serveur (secrets remplacés par `CHANGE_ME`). Cli
 
 <pre>
 plugins/SHIsValues/
-└── <a href="src/main/resources/config.yml">config.yml</a>
+├── <a href="src/main/resources/config.yml">config.yml</a>
+└── <a href="src/main/resources/messages.yml">messages.yml</a>
 </pre>
+
+Au premier démarrage avec `messages.yml`, le fichier est créé à partir des sections `messages`, `access-messages` et `access-placeholders` de l'ancien `config.yml` (textes déjà en place), complétées par celles du jar ; ces sections ne sont plus lues ensuite.
 
 ## Compilation
 

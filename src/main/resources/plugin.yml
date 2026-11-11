@@ -8,12 +8,33 @@ depend: [SuperiorSkyblock2]
 softdepend: [PlaceholderAPI]
 
 commands:
-  shiv:
-    description: Commandes relatives aux valeurs d'île.
-    usage: /<command> values | /<command> value
-    # Les sous-commandes seront gérées dans le code
+  shisvalues:
+    description: Valeurs des blocs d'île (menu) et administration de SHIsValues.
+    usage: /<command> <values|value|reload>
+    aliases: [shiv]
+    # Les sous-commandes et leurs droits sont gérés dans le code
 
 permissions:
-  shisvalues.command.is.acces:
+  shisvalues.values:
+    description: /shisvalues values, menu des valeurs de blocs.
+    default: op
+  shisvalues.value:
+    description: /shisvalues value, menu à la page de l'objet tenu en main.
+    default: op
+  shisvalues.is.values:
+    description: /is values gérée par le plugin (menu des valeurs).
+    default: op
+  shisvalues.is.value:
+    description: /is value gérée par le plugin (valeur de l'objet tenu en main).
+    default: op
+  shisvalues.is.acces:
     description: /is acces, joueurs ayant des permissions particulières sur son île.
     default: true
+  shisvalues.admin:
+    description: Toutes les commandes d'administration de SHIsValues.
+    default: op
+    children:
+      shisvalues.admin.reload: true
+  shisvalues.admin.reload:
+    description: Recharger config.yml, messages.yml et les valeurs de blocs.
+    default: false

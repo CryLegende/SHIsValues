@@ -3,10 +3,11 @@ package org.Cry_Legende.sHIsValues.managers;
 import org.Cry_Legende.sHIsValues.SHIsValues;
 import org.Cry_Legende.sHIsValues.utils.BlockValue;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +40,12 @@ public class ValuesManager {
         return material.isItem();
     }
 
+    /**
+     * Relit les valeurs de blocs de SuperiorSkyblock2. Les valeurs déjà chargées ne sont remplacées qu'en cas de
+     * succès : un fichier absent ne vide pas le menu.
+     */
     public boolean loadBlockValues() {
-        blockValues.clear();
+        List<BlockValue> loaded = new ArrayList<>();
 
         File serverRootFolder = plugin.getDataFolder().getParentFile().getParentFile();
         File ssb2ValuesFile = new File(serverRootFolder, plugin.getConfigManager().ssb2ValuesPath);
@@ -50,7 +55,13 @@ public class ValuesManager {
             return false;
         }
 
-        FileConfiguration ssb2Config = YamlConfiguration.loadConfiguration(ssb2ValuesFile);
+        YamlConfiguration ssb2Config = new YamlConfiguration();
+        try {
+            ssb2Config.load(ssb2ValuesFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            plugin.getLogger().severe("Le fichier " + ssb2ValuesFile.getAbsolutePath() + " est illisible : " + e.getMessage());
+            return false;
+        }
 
         for (String key : ssb2Config.getKeys(false)) {
             Material material = Material.matchMaterial(key.toUpperCase());
@@ -70,18 +81,20 @@ public class ValuesManager {
             double value = ssb2Config.getDouble(key, 0.0);
 
             if (value > 0) {
-                blockValues.add(new BlockValue(material, value));
+                loaded.add(new BlockValue(material, value));
             }
         }
 
-        if (blockValues.isEmpty() && !ssb2Config.getKeys(false).isEmpty()) {
+        if (loaded.isEmpty() && !ssb2Config.getKeys(false).isEmpty()) {
             plugin.getLogger().warning("Aucune valeur de bloc affichable (valeur > 0 et item valide) n'a été chargée depuis " + ssb2ValuesFile.getName() +
                 ", mais le fichier contient des entrées. Vérifiez les valeurs et les types de matériaux.");
         } else if (ssb2Config.getKeys(false).isEmpty()) {
             plugin.getLogger().warning("Le fichier " + ssb2ValuesFile.getName() + " est vide ou ne contient aucune clé de bloc.");
         }
 
-        Collections.sort(blockValues);
+        Collections.sort(loaded);
+        blockValues.clear();
+        blockValues.addAll(loaded);
         plugin.getLogger().info("Chargé " + blockValues.size() + " valeurs de blocs affichables depuis " + ssb2ValuesFile.getName());
         return true;
     }

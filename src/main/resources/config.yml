@@ -1,4 +1,29 @@
-# Configuration pour SHIsValues
+# ----------------------------------------------------------------#
+#                   Configuration de SHIsValues                   #
+# ----------------------------------------------------------------#
+#
+# Menu des valeurs de blocs de SuperiorSkyblock2 (lues dans block-values/levels.yml) et liste des joueurs ayant des
+# permissions particulières sur l'île. Les textes sont dans messages.yml.
+#
+# Commandes :
+#   /shisvalues values   Ouvre le menu des valeurs (alias /shiv ; joueurs seulement).
+#   /shisvalues value    Ouvre le menu à la page de l'objet tenu en main (joueurs seulement).
+#   /shisvalues reload   Recharge config.yml, messages.yml, les valeurs de SuperiorSkyblock2 et les noms des
+#                        permissions d'île. Un fichier invalide annule le rechargement.
+#
+# Sous-commandes de /is gérées par le plugin (SuperiorSkyblock2 traite /is normalement pour qui n'a pas le droit) :
+#   /is values   Même menu que /shisvalues values.
+#   /is value    Même menu que /shisvalues value.
+#   /is acces    Liste des joueurs ayant des permissions particulières sur votre île.
+#
+# Permissions :
+#   shisvalues.values          /shisvalues values (op par défaut).
+#   shisvalues.value           /shisvalues value (op par défaut).
+#   shisvalues.is.values       /is values (op par défaut).
+#   shisvalues.is.value        /is value (op par défaut).
+#   shisvalues.is.acces        /is acces (tout le monde par défaut).
+#   shisvalues.admin           Toutes les commandes d'administration (op par défaut).
+#   shisvalues.admin.reload    /shisvalues reload
 
 gui:
   title: "&8&lMenu &8| Valeurs (%page%/%max_pages%)"
@@ -56,38 +81,5 @@ gui:
       - "&f• &7Quantité: &f%superior_island_count_{material_id}%x"
       - ""
 
-messages:
-  no_permission: "&7&l« &c&lSH &8&l» &7Vous n'avez pas la permission d'utiliser cette commande."
-  player_only: "&7&l« &c&lSH &8&l» &7Cette commande ne peut être exécutée que par un joueur."
-  gui_opened: "&7&l« &a&lSH &8&l» &7Ouverture du menu des &avaleurs&7..."
-  item_not_found_in_values: "&7&l« &c&lSH &8&l» &7L'item que vous tenez n'a pas de valeur définie ou n'a pas pu être trouvé."
-  ssb2_values_not_found: "&7&l« &c&lSH &8&l» &7Impossible de charger les valeurs des blocs depuis &cSuperiorSkyblock2&7. Le fichier est-il présent ?"
-  ssb2_values_error: "&7&l« &c&lSH &8&l» &7Une erreur est survenue lors de la lecture des valeurs de &cSuperiorSkyblock2&7."
-  config_reloaded: "&7&l« &a&lSH &8&l» &7Configuration de SHIsValues rechargée &aavec succès&7."
-  no_value_slots_configured: "&7&l« &c&lSH &8&l» &7Aucun slot n'est configuré pour les items de valeur et le remplissage automatique n'a trouvé aucun slot. &cVérifiez la configuration du GUI&7."
-  no_values_to_display: "&7&l« &e&lSH &8&l» &7Il n'y a aucune valeur de bloc à afficher pour le moment."
-
-
+# Fichier des valeurs de blocs de SuperiorSkyblock2, relatif à la racine du serveur.
 superior_skyblock_values_path: "plugins/SuperiorSkyblock2/block-values/levels.yml"
-# /is acces : joueurs ayant des permissions particulières sur l'île (réglées avec /is permissions <joueur>).
-# Clic sur une ligne = menu de permissions du joueur. Noms des permissions : menus/permissions.yml de SuperiorSkyblock2.
-# Placeholders : %count% (header), %player% (line, hover), %permissions% (line), %list% (allowed, denied).
-access-messages:
-  no-island: "&7&l« &c&lSH &8&l» &7Vous n'avez pas d'île (&c/is&7)."
-  empty: "&7&l« &e&lSH &8&l» &7Aucun joueur n'a de permission particulière sur votre île."
-  header: "&7&l« &e&lSH &8&l» &7Permissions particulières sur votre île (&e%count% joueur(s)&7) :"
-  line: "&8• &e%player% &8» %permissions%"
-  allowed: "&a✔ %list%"
-  denied: "&c✘ %list%"
-  hover: "&7Cliquez pour modifier les permissions de &e%player%"
-
-# Placeholders %shisvalues_acces_<status|allowed|denied>_<chef>% : accès du joueur du contexte à l'île de <chef>
-# (utilisés par /infos <joueur> avec %viewer%). %role% = rôle du membre.
-access-placeholders:
-  no-island: "&7Aucune île"
-  owner: "&6Chef de l'île"
-  member: "&aMembre &7(%role%&7)"
-  coop: "&bCoopérateur"
-  banned: "&cBanni"
-  visitor: "&7Visiteur"
-  none: "&8aucune"
