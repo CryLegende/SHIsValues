@@ -63,6 +63,7 @@ public class ValuesManager {
             return false;
         }
 
+        int hidden = 0;
         for (String key : ssb2Config.getKeys(false)) {
             Material material = Material.matchMaterial(key.toUpperCase());
             if (material == null) {
@@ -70,12 +71,10 @@ public class ValuesManager {
                 continue;
             }
 
-            // --- C'EST LA CORRECTION PRINCIPALE ---
-            // On vérifie ici si le matériau peut être affiché avant même de le traiter.
+            // Blocs sans item (têtes et bannières murales, bougies sur gâteau...) : rien à afficher dans le menu
             if (!isMaterialRenderable(material)) {
-                // On logue (optionnel) pour savoir quels blocs sont ignorés.
-                plugin.getLogger().info("Matériau '" + material.name() + "' ignoré car il n'a pas de représentation en item.");
-                continue; // On passe au bloc suivant.
+                hidden++;
+                continue;
             }
 
             double value = ssb2Config.getDouble(key, 0.0);
@@ -95,7 +94,8 @@ public class ValuesManager {
         Collections.sort(loaded);
         blockValues.clear();
         blockValues.addAll(loaded);
-        plugin.getLogger().info("Chargé " + blockValues.size() + " valeurs de blocs affichables depuis " + ssb2ValuesFile.getName());
+        plugin.getLogger().info(blockValues.size() + " valeur(s) de bloc affichable(s) chargée(s) depuis " + ssb2ValuesFile.getName()
+            + (hidden > 0 ? " (" + hidden + " bloc(s) sans item ignoré(s))." : "."));
         return true;
     }
 

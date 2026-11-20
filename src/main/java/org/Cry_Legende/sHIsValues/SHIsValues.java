@@ -54,9 +54,6 @@ public class SHIsValues extends JavaPlugin {
         // Vérifier PlaceholderAPI
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             placeholderApiHooked = true;
-            getLogger().info("PlaceholderAPI trouvé et activé pour SHIsValues !");
-        } else {
-            getLogger().info("PlaceholderAPI non trouvé. Les placeholders PAPI ne seront pas fonctionnels.");
         }
 
         // Configuration
@@ -101,13 +98,10 @@ public class SHIsValues extends JavaPlugin {
         getServer().getPluginManager().registerEvents(valuesGUI, this); // Pour les clics dans le GUI
         getServer().getPluginManager().registerEvents(new IslandSubcommandListener(this), this); // Pour intercepter /is values, /is value et /is acces
 
-        getLogger().info("SHIsValues a été activé !");
-        getLogger().info("Commande disponible: /shisvalues, et les sous-commandes /is values, /is value, /is acces pour les joueurs qui en ont le droit.");
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("SHIsValues a été désactivé.");
     }
 
     // Getters pour que d'autres classes puissent accéder à ces instances
